@@ -1,6 +1,8 @@
 import pygame
+import sys
 from board import Board
 from player import Helicopter
+
 
 """Инициализация ПуГаме"""
 pygame.init()
@@ -111,6 +113,7 @@ def game_process():
         pygame.display.flip()
     """Основной игровой цикл окна закончился"""
     pygame.quit()
+    sys.exit(0)
 
 
 def how_to_play():
@@ -156,7 +159,7 @@ def main_menu():
         pygame.display.flip()
     """Основной игровой цикл окна закончился"""
     pygame.quit()
-
+    sys.exit(0)
 
 """Инициализация меню"""
 main_menu()
