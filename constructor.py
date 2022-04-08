@@ -1,9 +1,11 @@
 import pygame
+from board import Board
+from player import Helicopter
 
 """Инициализация ПуГаме"""
 pygame.init()
 """Окно"""
-width, height = window_size = 16 * 64, 9 * 64
+width, height = window_size = 16 * 80, 9 * 80
 screen = pygame.display.set_mode(window_size)
 """Клок"""
 clock = pygame.time.Clock()
@@ -13,58 +15,6 @@ font_used = pygame.font.SysFont("proxima nova bold", 32)
 """Предустановка переменных"""
 
 
-"""Класс доски"""
-class Board:
-    # создание поля
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-        self.board = [[(255, 255, 0)] * width for _ in range(height)]
-
-        # значения по умолчанию
-        self.left = 0
-        self.top = 0
-        self.cell_size = 64
-    # настройка внешнего вида
-    def set_view(self, left, top, cell_size):
-        self.left = left
-        self.top = top
-        self.cell_size = cell_size
-
-    def update(self, screen):
-        for y in range(self.height):
-            for x in range(self.width):
-                pygame.draw.rect(screen, (0, 0, 0), (
-                    self.left + self.cell_size * x, self.top + self.cell_size * y,
-                    self.cell_size, self.cell_size), 4)
-                pygame.draw.rect(screen, self.board[y][x], (
-                    self.left + self.cell_size * x + 2,
-                    self.top + self.cell_size * y + 2,
-                    self.cell_size - 4, self.cell_size - 4))
-
-    def get_cell(self, mouse_pos):
-        x, y = mouse_pos
-        if x > self.cell_size * self.width + self.left or \
-                x < self.left or \
-                y > self.cell_size * self.height + self.top or \
-                y < self.top:
-            return None
-        else:
-            x, y = int((x - self.left) / self.cell_size), \
-                   int((y - self.top) / self.cell_size)
-            return x, y
-
-    def on_click(self, cell_coords):
-        if cell_coords is None:
-            return
-        y, x = cell_coords
-        if self.board[x][y] == (255, 255, 0):
-            self.board[x][y] = (0, 0, 0)
-        elif self.board[x][y] == (0, 0, 0):
-            self.board[x][y] = (0, 255, 0)
-        elif self.board[x][y] == (0, 255, 0):
-            self.board[x][y] = (255, 255, 0)
-
 
 """Основные функциональные классы"""
 
@@ -72,7 +22,7 @@ class Board:
 class Button(pygame.sprite.Sprite):
     """Инициализация кнопки"""
 
-    def __init__(self, size=(100, 50), position=(0, 0), base_color=(0, 128, 0), pointed_color=(0, 255, 0), text=None,
+    def __init__(self, size=(100, 50), position=(0, 0), base_color=(0, 128, 0), pointed_color=(0, 160, 0), text=None,
                  bind=None):
         pygame.sprite.Sprite.__init__(self)
         """Основные переменные"""
@@ -117,11 +67,20 @@ def game_process():
     fps = 60
     buttons = pygame.sprite.Group()
     """Создание доски"""
-    board = Board(16, 9)
+    board = Board(lines_and_columns=(18, 32), cell_size=(40, 40))
+    """Создание игрока"""
+    all_sprites = pygame.sprite.Group()
+    hel_group = pygame.sprite.Group()
+    helicopter = Helicopter((360, 240), screen)
+    all_sprites.add(helicopter)
+    hel_group.add(helicopter)
     """Основной игровой цикл окна"""
     process_run = True
     while process_run:
-        screen.fill((255, 255, 255))
+        screen.fill((119, 189, 201))
+        x, y = helicopter.rect.center
+        y += 50
+        x -= 20
         clock.tick(fps)
         """Реакция на события в окне"""
         for event in pygame.event.get():
@@ -130,7 +89,6 @@ def game_process():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     board.on_click(board.get_cell(event.pos))
-
             if event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_b]:
@@ -138,12 +96,17 @@ def game_process():
                     buttons.add(button)
                 if keys[pygame.K_ESCAPE]:
                     main_menu()
-        """Отображение кнопок"""
-        board.update(screen)
-        buttons.draw(screen)
-
-        buttons.update()
+                if keys[pygame.K_SPACE]:
+                    board.on_click(board.get_cell((x, y)))
+        """"Обновление игровых объектов"""
+        all_sprites.update()
         """Отрисовка всего что нужно в окне"""
+        board.render(screen)
+        pygame.draw.rect(screen, (0, 0, 0), (x, y, 10, 10))
+        hel_group.draw(screen)
+        """Отображение кнопок"""
+        buttons.draw(screen)
+        buttons.update()
         """Обновление экрана"""
         pygame.display.flip()
     """Основной игровой цикл окна закончился"""
