@@ -70,13 +70,15 @@ def game_process():
     buttons = pygame.sprite.Group()
     """Создание доски"""
     board = Board(lines_and_columns=(18, 32), cell_size=(40, 40))
+    score = 0
+    font = pygame.font.SysFont("proxima nova bold", 32)
     for i in range(32):
-        board.board[0][i] = -2
-        board.board[-1][i] = -2
+        board.board[0][i] = -1
+        board.board[-1][i] = -1
     print(board.board)
     for i in range(18):
-        board.board[i][0] = -2
-        board.board[i][-1] = -2
+        board.board[i][0] = -1
+        board.board[i][-1] = -1
     print(board.board)
     """Создание игрока"""
     all_sprites = pygame.sprite.Group()
@@ -108,6 +110,8 @@ def game_process():
                     main_menu()
                 if keys[pygame.K_SPACE]:
                     board.on_click(board.get_cell((x, y)))
+                if keys[pygame.K_f]:
+                    line, column = board.get_cell((x, y))
         """"Обновление игровых объектов"""
         all_sprites.update()
         """Отрисовка всего что нужно в окне"""
@@ -118,6 +122,8 @@ def game_process():
         buttons.draw(screen)
         buttons.update()
         """Обновление экрана"""
+        score_text = font.render(str(score), True, (254, 254, 254))
+        screen.blit(score_text, (21*40, 0))
         pygame.display.flip()
     """Основной игровой цикл окна закончился"""
     pygame.quit()

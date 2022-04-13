@@ -27,7 +27,6 @@ class Board:
         if position != None:
             column, line = position
             self.board[line][column] = 60 * 10
-            print(self.board)
 
 
     def render(self, screen):
@@ -38,10 +37,10 @@ class Board:
                 pygame.draw.rect(screen, self.grid_color, (self.left_gap + column * self.cell_size_x, self.up_gap + line * self.cell_size_y, self.cell_size_x, self.cell_size_y), 1)
                 """Отрисовка содержимого клеток"""
                 lifetime = self.board[line][column]
-                if lifetime >= 0:
+                if lifetime > 0:
                     k = lifetime / 600
                     pygame.draw.circle(screen, (254 - int(135 * k), 254 - int(65 * k), 254 - int(53 * k)), (self.left_gap + column * self.cell_size_x + self.cell_size_x // 2, self.up_gap + line * self.cell_size_y + self.cell_size_y // 2), self.cell_size_x // 2)
                     self.board[line][column] -= 1
-                elif lifetime == -2:
-                    pygame.draw.rect(screen, (164, 128, 64), (self.left_gap + column * self.cell_size_x, self.up_gap + line * self.cell_size_y, self.cell_size_x, self.cell_size_y))
+                elif lifetime == -1:
+                    pygame.draw.rect(screen, (89, 142, 57), (self.left_gap + column * self.cell_size_x, self.up_gap + line * self.cell_size_y, self.cell_size_x, self.cell_size_y))
                     # pygame.draw.circle(screen, (164, 128, 64), (self.left_gap + column * self.cell_size_x + self.cell_size_x // 2, self.up_gap + line * self.cell_size_y + self.cell_size_y // 2), self.cell_size_x // 2)
