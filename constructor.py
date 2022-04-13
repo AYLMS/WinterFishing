@@ -70,6 +70,14 @@ def game_process():
     buttons = pygame.sprite.Group()
     """Создание доски"""
     board = Board(lines_and_columns=(18, 32), cell_size=(40, 40))
+    for i in range(32):
+        board.board[0][i] = -2
+        board.board[-1][i] = -2
+    print(board.board)
+    for i in range(18):
+        board.board[i][0] = -2
+        board.board[i][-1] = -2
+    print(board.board)
     """Создание игрока"""
     all_sprites = pygame.sprite.Group()
     hel_group = pygame.sprite.Group()
@@ -79,7 +87,7 @@ def game_process():
     """Основной игровой цикл окна"""
     process_run = True
     while process_run:
-        screen.fill((119, 189, 201))
+        screen.fill((254, 254, 254))
         x, y = helicopter.rect.center
         y += 50
         x -= 20
@@ -90,7 +98,7 @@ def game_process():
                 process_run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
-                    board.on_click(board.get_cell(event.pos))
+                    print(board.get_cell(pygame.mouse.get_pos()))
             if event.type == pygame.KEYDOWN:
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_b]:

@@ -21,11 +21,11 @@ class Helicopter(pygame.sprite.Sprite):
         return self.rect.center
 
     def update(self):
-        if pygame.key.get_pressed()[pygame.K_RIGHT]:
+        if pygame.key.get_pressed()[pygame.K_RIGHT] and self.rect.right < 31 * 40:
             self.rect.x += 10
-        if pygame.key.get_pressed()[pygame.K_LEFT]:
+        if pygame.key.get_pressed()[pygame.K_LEFT] and self.rect.left > 40:
             self.rect.x -= 10
-        if pygame.key.get_pressed()[pygame.K_UP]:
+        if pygame.key.get_pressed()[pygame.K_UP] and self.rect.top > 40:
             self.rect.y -= 6
-        if pygame.key.get_pressed()[pygame.K_DOWN]:
+        if pygame.key.get_pressed()[pygame.K_DOWN] and self.rect.bottom < 17 * 40:
             self.rect.y += 6

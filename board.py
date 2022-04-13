@@ -26,8 +26,9 @@ class Board:
         """События после нажатия"""
         if position != None:
             column, line = position
-            self.board[line][column] = 1 - self.board[line][column]
-            print(self.board[line][column])
+            self.board[line][column] = 60 * 10
+            print(self.board)
+
 
     def render(self, screen):
         """Отрисовка сетки и клеток у доски"""
@@ -36,5 +37,11 @@ class Board:
                 """Отрисовка сетки"""
                 pygame.draw.rect(screen, self.grid_color, (self.left_gap + column * self.cell_size_x, self.up_gap + line * self.cell_size_y, self.cell_size_x, self.cell_size_y), 1)
                 """Отрисовка содержимого клеток"""
-                if self.board[line][column] == 1:
-                    pygame.draw.circle(screen, (255, 255, 255), (self.left_gap + column * self.cell_size_x + self.cell_size_x // 2, self.up_gap + line * self.cell_size_y + self.cell_size_y // 2), self.cell_size_x // 2)
+                lifetime = self.board[line][column]
+                if lifetime >= 0:
+                    k = lifetime / 600
+                    pygame.draw.circle(screen, (254 - int(135 * k), 254 - int(65 * k), 254 - int(53 * k)), (self.left_gap + column * self.cell_size_x + self.cell_size_x // 2, self.up_gap + line * self.cell_size_y + self.cell_size_y // 2), self.cell_size_x // 2)
+                    self.board[line][column] -= 1
+                elif lifetime == -2:
+                    pygame.draw.rect(screen, (164, 128, 64), (self.left_gap + column * self.cell_size_x, self.up_gap + line * self.cell_size_y, self.cell_size_x, self.cell_size_y))
+                    # pygame.draw.circle(screen, (164, 128, 64), (self.left_gap + column * self.cell_size_x + self.cell_size_x // 2, self.up_gap + line * self.cell_size_y + self.cell_size_y // 2), self.cell_size_x // 2)
