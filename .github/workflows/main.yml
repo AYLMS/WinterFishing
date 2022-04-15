@@ -18,11 +18,14 @@ jobs:
 
       - name: Build
         run: pyinstaller --onefile --noconsole main.py -n Game
+        
+      - name: Zip
+        run: tar.exe -a -c -f Game.zip ./dist/Game.exe ./data
 
       - uses: actions/upload-artifact@v2
         with:
-          name: Game
-          path: ./dist/Game.exe
+          name: Game-Windows
+          path: Game.zip
 
   build-mac:
 
@@ -65,6 +68,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.run_id }}
+          release_name: PyGame Release
           draft: false
           prerelease: false
       - name: Upload Windows Release Asset
@@ -74,9 +78,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/Game.exe
-          asset_name: Game-Windows.exe
-          asset_content_type: application/exe
+          asset_path: ./dist/Game-Windows.zip
+          asset_name: Game-Windows.zip
+          asset_content_type: application/zip
 
       - name: Upload MacOS Release Asset
         id: upload-release-asset-mac
