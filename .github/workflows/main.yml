@@ -64,8 +64,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: $(echo $GITHUB_SHA | cut -c1-7)
-          release_name: PySender $(echo $GITHUB_SHA | cut -c1-7)
           draft: false
           prerelease: false
       - name: Upload Windows Release Asset
