@@ -1,91 +1,216 @@
-import random
-
+import sys
 import pygame
-import time
+
+"""Инициализация ПуГаме"""
+pygame.init()
+"""Окно"""
+width, height = window_size = 16 * 80, 9 * 80
+screen = pygame.display.set_mode(window_size)
+"""Клок"""
+clock = pygame.time.Clock()
+"""Шрифт"""
+pygame.font.init()
+font_used = pygame.font.SysFont("proxima nova bold", 32)
+"""Предустановка переменных"""
+
+"""Основные функциональные классы"""
 
 
-class Helicopter(pygame.sprite.Sprite):
-    def __init__(self, xy):
+class Board:
+    """Инициализация доски"""
+
+    def __init__(self, lines_and_columns=(9, 16), cell_size=(80, 80), left_gap=0, up_gap=0, grid_color=(32, 128, 64)):
+        """Основные константы и переменные"""
+        # количество столбцов и строчек
+        self.lines, self.columns = lines_and_columns
+        # размеры клеток
+        self.cell_size_x, self.cell_size_y = cell_size
+        # отступы доски слева и сверху
+        self.left_gap, self.up_gap = left_gap, up_gap
+        # цвет сетки
+        self.grid_color = grid_color
+        """Матрица доски"""
+        # с ней можно потом свободно взаимодействовать
+        self.board = [[0] * self.columns for _ in range(self.lines)]
+
+    def get_cell(self, mouse_pos):
+        """Получение номера клетки формата (x, y)"""
+        x, y = mouse_pos
+        """Вне поля"""
+        if x < self.left_gap or x > self.left_gap + self.columns * self.cell_size_x or y < self.up_gap or y > self.up_gap + self.lines * self.cell_size_y:
+            return None
+        """В поле"""
+        column, line = int((x - self.left_gap) / self.cell_size_x), int((y - self.up_gap) / self.cell_size_y)
+        return column, line
+
+    def on_click(self, position):
+        """События после нажатия"""
+        # если нажали на клетку
+        if position:
+            # действия, реакция на нажатия
+            column, line = position
+            print(self.board[line][column])
+
+    def render(self, screen):
+        """Отрисовка сетки и клеток у доски"""
+        # перебором каждой клетки, да долго, но удобно зато)
+        for line in range(self.lines):
+            for column in range(self.columns):
+                """Отрисовка сетки"""
+                pygame.draw.rect(screen, self.grid_color, (
+                self.left_gap + column * self.cell_size_x, self.up_gap + line * self.cell_size_y, self.cell_size_x,
+                self.cell_size_y), 1)
+                """Отрисовка клеток"""
+                """if (column + line) % 2 == 1:
+                    pygame.draw.rect(screen, (0, 0, 0), (self.left_gap + column * self.cell_size_x, self.up_gap + line * self.cell_size_y, self.cell_size_x, self.cell_size_y))
+                else:
+                    pygame.draw.rect(screen, (223, 223, 223), (self.left_gap + column * self.cell_size_x, self.up_gap + line * self.cell_size_y, self.cell_size_x, self.cell_size_y))"""
+                """Отрисовка содержимого клеток"""
+
+
+class Button(pygame.sprite.Sprite):
+    """Инициализация кнопки"""
+
+    def __init__(self, size=(100, 50), position=(0, 0), base_color=(0, 128, 0), pointed_color=(32, 160, 32), text=''):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface([72, 48])
-        self.image.fill((255, 0, 0))
+        """Основные константы и переменные"""
+        # длина и высота кнопки
+        self.length, self.height = size
+        # основной цвет и цвет когда навелись
+        self.base_color, self.pointed_color = base_color, pointed_color
+        # бинд кнопки
+        # текст не передан - текст на кнопке название бинда
+        # шрифт текста кнопки
+        self.text = font_used.render(text, True, (255, 255, 255))
+        """Создание картинки или дрйгой херни"""
+        self.image = pygame.Surface([self.length, self.height])
         self.rect = self.image.get_rect()
-        self.rect.center = xy
+        # размещение кнопки
+        self.rect.x, self.rect.y = position
 
-    def coords(self):
-        return self.rect.center
+    """Отрисовка кнопки"""
 
     def update(self):
-        if pygame.key.get_pressed()[pygame.K_RIGHT]:
-            self.rect.x += 1
-        if pygame.key.get_pressed()[pygame.K_LEFT]:
-            self.rect.x -= 1
-        if pygame.key.get_pressed()[pygame.K_UP]:
-            self.rect.y -= 1
-        if pygame.key.get_pressed()[pygame.K_DOWN]:
-            self.rect.y += 1
-
-
-class Hole(pygame.sprite.Sprite):
-    def __init__(self, coords=(random.randint(18, 702), random.randint(12, 468)), isbomb=False):
-        self.needkill = False
-        self.k = 0.5
-        self.lifetime = 60 * 5
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface([self.k * self.lifetime, self.k * self.lifetime])
-        self.image.fill((random.randint(0, 255), 25, 125))
-        self.rect = self.image.get_rect()
-
-        self.rect.center = coords
-        if isbomb and pygame.sprite.spritecollide(self, holes, False):
-            self.needkill = True
-            print('*плюх')
+        """Здесь пишутся функции к которым обращаются кнопки"""
+        """На кнопку навели курсор"""
+        if self.rect.collidepoint(pygame.mouse.get_pos()):
+            # some action
+            self.image.fill(self.pointed_color)
         else:
-            while pygame.sprite.spritecollide(self, holes, False):
-                self.rect.center = (random.randint(18, 702), random.randint(12, 468))
+            # кнопка просто есть
+            self.image.fill(self.base_color)
+        screen.blit(self.text, (self.rect.x + 10, self.rect.y + 10))
 
-    def update(self):
-        self.lifetime -= 1
-        self.image = pygame.Surface((int(self.k * self.lifetime), int(self.k * self.lifetime)))
-        self.image.fill((random.randint(0, 255), 25, 125))
-        self.rect = self.image.get_rect()
+    """Реакция кнопки на нажатие"""
 
-if __name__ == '__main__':
-    pygame.init()
-    pygame.font.init()
-    size = width, height = 720, 480
-    screen = pygame.display.set_mode(size)
-    screen.fill((100, 100, 100))
+    def clicked(self):
+        # кнопку нажали
+        return bool(self.rect.collidepoint(pygame.mouse.get_pos()) and (
+                    pygame.mouse.get_pressed(3)[0] or pygame.key.get_pressed()[pygame.K_SPACE]))
 
-    all_sprites = pygame.sprite.Group()
-    hel = pygame.sprite.Group()
-    helicopter = Helicopter((360, 240))
-    all_sprites.add(helicopter)
-    hel.add(helicopter)
 
-    holes = pygame.sprite.Group()
+"""Функции интерфейсов и игровых процессов"""
 
-    clock = pygame.time.Clock()
-    running = True
-    while running:
-        clock.tick(60)
+
+def some_bind():
+    """Предустановка для Меню"""
+    # частота обновления кадров
+    fps = 60
+    """Кнопки окна"""
+    buttons = pygame.sprite.Group()
+    # и тут создание кнопочек
+    """Основной игровой цикл окна"""
+    # запуск цикла
+    process_run = True
+    # сам цикл игры
+    while process_run:
+        # заливка экрана
+        screen.fill((0, 0, 0))
+        # выставляем частоту кадров
+        clock.tick(fps)
+        """Реакция на события в окне"""
         for event in pygame.event.get():
+            """Нажат крестик у приложения"""
             if event.type == pygame.QUIT:
-                running = False
+                process_run = False
+            """Нажата любая кнопка"""
             if event.type == pygame.KEYDOWN:
+                # список всех кнопок, к ним просто обращаемся
                 keys = pygame.key.get_pressed()
-                if keys[pygame.K_SPACE]:
-                    print("space_pressed")
-                    x, y = helicopter.coords()
-                    hole = Hole(coords=(x, y + 48), isbomb=True)
-                    holes.add(hole)
-                    all_sprites.add(hole)
-                    if hole.needkill:
-                        hole.kill()
-
-        screen.fill((224, 255, 255))
-        all_sprites.update()
-        all_sprites.draw(screen)
-        hel.draw(screen)
+                # здесь сам бинд клавиш
+            """Нажата кнопка мыши"""
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # тоже список всех кнопок
+                mouse_buttons = pygame.mouse.get_pressed()
+                # здесь бинд buttons или чего другого
+                # if b_example.clicked():
+                #   и делать что-то
+        """Обновление всего что нужно в окне"""
+        # здесь чисто update классов
+        """Отрисовка всего что нужно в окне"""
+        # отображение сетки, игрока...
+        """Отрисовка и обновление кнопочек"""
+        # отрисовка кнопочек
+        buttons.draw(screen)
+        buttons.update()
+        """Обновление экрана"""
         pygame.display.flip()
+    """Основной игровой цикл окна закончился"""
+    # закрываем Пугаме
     pygame.quit()
+    # вырубаем программу, чтобы ошибок не было )))
+    sys.exit(0)
+
+
+def example():
+    """Предустановка для Меню"""
+    # частота обновления кадров
+    fps = 60
+    """Кнопки окна"""
+    buttons = pygame.sprite.Group()
+    # и тут создание кнопочек
+    """Основной игровой цикл окна"""
+    # запуск цикла
+    process_run = True
+    # сам цикл игры
+    while process_run:
+        # заливка экрана
+        screen.fill((0, 0, 0))
+        # выставляем частоту кадров
+        clock.tick(fps)
+        """Реакция на события в окне"""
+        for event in pygame.event.get():
+            """Нажат крестик у приложения"""
+            if event.type == pygame.QUIT:
+                process_run = False
+            """Нажата любая кнопка"""
+            if event.type == pygame.KEYDOWN:
+                # список всех кнопок, к ним просто обращаемся
+                keys = pygame.key.get_pressed()
+                # здесь сам бинд клавиш
+            """Нажата кнопка мыши"""
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                # тоже список всех кнопок
+                mouse_buttons = pygame.mouse.get_pressed()
+                # здесь бинд buttons или чего другого
+                # if b_example.clicked():
+                #   и делать что-то
+        """Обновление всего что нужно в окне"""
+        # здесь чисто update классов
+        """Отрисовка всего что нужно в окне"""
+        # отображение сетки, игрока...
+        """Отрисовка и обновление кнопочек"""
+        # отрисовка кнопочек
+        buttons.draw(screen)
+        buttons.update()
+        """Обновление экрана"""
+        pygame.display.flip()
+    """Основной игровой цикл окна закончился"""
+    # закрываем Пугаме
+    pygame.quit()
+    # вырубаем программу, чтобы ошибок не было )))
+    sys.exit(0)
+    print()
+"""Инициализация меню"""
+# здесь начальный процесс
+example()
