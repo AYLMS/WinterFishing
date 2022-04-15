@@ -1,6 +1,7 @@
 import sys
 import pygame
 
+
 """Инициализация ПуГаме"""
 pygame.init()
 """Окно"""
@@ -13,13 +14,13 @@ pygame.font.init()
 font_used = pygame.font.SysFont("proxima nova bold", 32)
 """Предустановка переменных"""
 
+
 """Основные функциональные классы"""
 
 
 class Board:
     """Инициализация доски"""
-
-    def __init__(self, lines_and_columns=(9, 16), cell_size=(80, 80), left_gap=0, up_gap=0, grid_color=(32, 128, 64)):
+    def __init__(self, lines_and_columns=(5, 5), cell_size=(64, 64), left_gap=0, up_gap=0, grid_color=(32, 128, 64)):
         """Основные константы и переменные"""
         # количество столбцов и строчек
         self.lines, self.columns = lines_and_columns
@@ -57,9 +58,7 @@ class Board:
         for line in range(self.lines):
             for column in range(self.columns):
                 """Отрисовка сетки"""
-                pygame.draw.rect(screen, self.grid_color, (
-                self.left_gap + column * self.cell_size_x, self.up_gap + line * self.cell_size_y, self.cell_size_x,
-                self.cell_size_y), 1)
+                pygame.draw.rect(screen, self.grid_color, (self.left_gap + column * self.cell_size_x, self.up_gap + line * self.cell_size_y, self.cell_size_x, self.cell_size_y), 1)
                 """Отрисовка клеток"""
                 """if (column + line) % 2 == 1:
                     pygame.draw.rect(screen, (0, 0, 0), (self.left_gap + column * self.cell_size_x, self.up_gap + line * self.cell_size_y, self.cell_size_x, self.cell_size_y))
@@ -70,7 +69,6 @@ class Board:
 
 class Button(pygame.sprite.Sprite):
     """Инициализация кнопки"""
-
     def __init__(self, size=(100, 50), position=(0, 0), base_color=(0, 128, 0), pointed_color=(32, 160, 32), text=''):
         pygame.sprite.Sprite.__init__(self)
         """Основные константы и переменные"""
@@ -89,7 +87,6 @@ class Button(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = position
 
     """Отрисовка кнопки"""
-
     def update(self):
         """Здесь пишутся функции к которым обращаются кнопки"""
         """На кнопку навели курсор"""
@@ -102,22 +99,27 @@ class Button(pygame.sprite.Sprite):
         screen.blit(self.text, (self.rect.x + 10, self.rect.y + 10))
 
     """Реакция кнопки на нажатие"""
-
     def clicked(self):
-        # кнопку нажали
-        return bool(self.rect.collidepoint(pygame.mouse.get_pos()) and (
-                    pygame.mouse.get_pressed(3)[0] or pygame.key.get_pressed()[pygame.K_SPACE]))
+        return bool(self.rect.collidepoint(pygame.mouse.get_pos()) and (pygame.mouse.get_pressed(3)[0] or pygame.key.get_pressed()[pygame.K_SPACE]))
+
 
 
 """Функции интерфейсов и игровых процессов"""
 
 
-def some_bind():
+def game():
     """Предустановка для Меню"""
     # частота обновления кадров
     fps = 60
     """Кнопки окна"""
     buttons = pygame.sprite.Group()
+    b_back = Button(size=(4 * 80, 2 * 80), position=(10 * 80, 1 * 80), base_color=(0, 0, 0), pointed_color=(32, 32, 32), text='Назад')
+    buttons.add(b_back)
+    b_yes = Button(size=(4 * 80, 2 * 80), position=(10*80, 3.5*80), base_color=(64, 192, 64), pointed_color=(96, 226, 96))
+    buttons.add(b_yes)
+    b_no = Button(size=(4 * 80, 2 * 80), position=(10*80, 6*80), base_color=(192, 64, 64), pointed_color=(226, 96, 96))
+    buttons.add(b_no)
+    board = Board(lines_and_columns=(9, 16), cell_size=(80, 80), grid_color=(32, 32, 128))
     # и тут создание кнопочек
     """Основной игровой цикл окна"""
     # запуск цикла
@@ -126,7 +128,7 @@ def some_bind():
     # сам цикл игры
     while process_run:
         # заливка экрана
-        screen.fill((0, 0, 0))
+        screen.fill((255, 255, 255))
         # выставляем частоту кадров
         clock.tick(fps)
         """Реакция на события в окне"""
@@ -138,18 +140,20 @@ def some_bind():
             if event.type == pygame.KEYDOWN:
                 # список всех кнопок, к ним просто обращаемся
                 keys = pygame.key.get_pressed()
-                # здесь сам бинд клавиш
-            """Нажата кнопка мыши"""
+                # здесь сам бинд кнопок
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # тоже список всех кнопок
                 mouse_buttons = pygame.mouse.get_pressed()
-                # здесь бинд buttons или чего другого
-                # if b_example.clicked():
-                #   и делать что-то
+                if b_back.clicked():
+                    example()
+                if b_yes.clicked():
+                    print('да')
+                if b_no.clicked():
+                    print('Нет')
         """Обновление всего что нужно в окне"""
         # здесь чисто update классов
         """Отрисовка всего что нужно в окне"""
         # отображение сетки, игрока...
+        board.render(screen)
         """Отрисовка и обновление кнопочек"""
         # отрисовка кнопочек
         screen.blit(image, (10, 10))
@@ -170,6 +174,15 @@ def example():
     fps = 60
     """Кнопки окна"""
     buttons = pygame.sprite.Group()
+    b_game = Button(size=(4 * 80, 2 * 80), position=(2*80, 1*80), base_color=(0, 0, 0), pointed_color=(32, 32, 32), text='НАЧАЛО ИГРЫ')
+    buttons.add(b_game)
+    b_authors = Button(size=(4 * 80, 2 * 80), position=(2*80, 3.5*80), base_color=(0, 0, 0), pointed_color=(32, 32, 32), text='Авторы')
+    buttons.add(b_authors)
+    b_settings = Button(size=(4 * 80, 2 * 80), position=(2 * 80, 6 * 80), base_color=(0, 0, 0), pointed_color=(32, 32, 32), text='Настройки')
+    buttons.add(b_settings)
+    board = Board(lines_and_columns=(9, 16), cell_size=(80, 80), grid_color=(32, 128, 32))
+    b_exit = Button(size=(4 * 80, 2 * 80), position=(6*80, 3.5*80), base_color=(0, 0, 0), pointed_color=(32, 32, 32), text='Вырубай')
+    buttons.add(b_exit)
     # и тут создание кнопочек
     """Основной игровой цикл окна"""
     # запуск цикла
@@ -177,7 +190,7 @@ def example():
     # сам цикл игры
     while process_run:
         # заливка экрана
-        screen.fill((0, 0, 0))
+        screen.fill((255, 255, 255))
         # выставляем частоту кадров
         clock.tick(fps)
         """Реакция на события в окне"""
@@ -189,17 +202,17 @@ def example():
             if event.type == pygame.KEYDOWN:
                 # список всех кнопок, к ним просто обращаемся
                 keys = pygame.key.get_pressed()
-                # здесь сам бинд клавиш
-            """Нажата кнопка мыши"""
+                # здесь сам бинд кнопок
             if event.type == pygame.MOUSEBUTTONDOWN:
-                # тоже список всех кнопок
                 mouse_buttons = pygame.mouse.get_pressed()
-                # здесь бинд buttons или чего другого
-                # if b_example.clicked():
-                #   и делать что-то
+                if b_game.clicked():
+                    game()
+                if b_exit.clicked():
+                    process_run = False
         """Обновление всего что нужно в окне"""
         # здесь чисто update классов
         """Отрисовка всего что нужно в окне"""
+        board.render(screen)
         # отображение сетки, игрока...
         """Отрисовка и обновление кнопочек"""
         # отрисовка кнопочек
@@ -212,7 +225,8 @@ def example():
     pygame.quit()
     # вырубаем программу, чтобы ошибок не было )))
     sys.exit(0)
-    print()
+
+
 """Инициализация меню"""
 # здесь начальный процесс
 example()
