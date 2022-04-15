@@ -122,6 +122,7 @@ def some_bind():
     """Основной игровой цикл окна"""
     # запуск цикла
     process_run = True
+    image = pygame.image.load('data\images.jpg')
     # сам цикл игры
     while process_run:
         # заливка экрана
@@ -151,6 +152,7 @@ def some_bind():
         # отображение сетки, игрока...
         """Отрисовка и обновление кнопочек"""
         # отрисовка кнопочек
+        screen.blit(image, (10, 10))
         buttons.draw(screen)
         buttons.update()
         """Обновление экрана"""
