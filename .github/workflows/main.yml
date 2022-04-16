@@ -1,6 +1,6 @@
 name: Publish Release to GitHub
 
-on: push
+# on: push
 
 env:
   PYTHON_VERSION: '3.10.4'
